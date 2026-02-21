@@ -35,34 +35,39 @@
 
   window.loginAdmin = async function(email, password) {
     const loginBtn = document.querySelector('#adminLoginForm .nav-btn');
-    if (!email || !password) { showToast("يرجى إدخال البيانات", "error"); return; }
+    if (!email || !password) { 
+        showToast("يرجى إدخال البيانات", "error"); 
+        return; 
+    }
 
     loginBtn.disabled = true;
-    const originalText = loginBtn.innerHTML; // حفظ النص الأصلي
-    loginBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> جاري تسجيل الدخول...`;
+    const originalText = loginBtn.innerHTML;
+    loginBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> جاري التحقق...`;
 
     try {
-      let finalEmail = email.trim() === "admin" ? "admin@clinic.com" : email.trim();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: finalEmail,
-        password: password
-      });
+        // ذكاء الاختصار: إذا لم يكتب @، أضف النطاق تلقائياً
+        let finalEmail = email.includes('@') ? email.trim() : `${email.trim()}@clinic.com`;
 
-      if (error) throw error;
-      
-      // ✅ إعادة الزر لحالته الطبيعية قبل الانتقال
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = `دخول`;
-      
-      window.isAdminLoggedIn = true;
-      renderAdminUI(true);
-      showToast("✅ تم تسجيل الدخول بنجاح", "success");
+        // الطلب يذهب للسيرفر (قاعدة البيانات) للتحقق
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: finalEmail,
+            password: password
+        });
+
+        if (error) throw error;
+        
+        // إذا نجح السيرفر في التحقق، يتم الدخول
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = originalText;
+        window.isAdminLoggedIn = true;
+        renderAdminUI(true);
+        showToast("✅ تم تسجيل الدخول بنجاح", "success");
 
     } catch (error) {
-      // إعادة الزر في حالة الفشل
-      loginBtn.disabled = false;
-      loginBtn.innerHTML = `دخول`;
-      showToast("❌ بيانات الدخول غير صحيحة", "error");
+        // إذا كانت كلمة المرور غلط أو البريد غير موجود في Supabase
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = `دخول`;
+        showToast("❌ بيانات الدخول غير صحيحة", "error");
     }
   };
 
@@ -1536,16 +1541,22 @@ function updateStepper() {
 
 function validateAndNext(idx) {
     const name = document.getElementById('pName');
+    const phoneInput = document.getElementById('pPhone');
+    const phoneNumber = phoneInput.value.trim();
+    
     if(!name.checkValidity()) { name.reportValidity(); return; }
     
-    if (!iti.isValidNumber()) {
+    // فحص خاص لليمن: هل الرقم يبدأ بـ 78 وطوله 9 أرقام؟
+    const isYemenMobile78 = iti.getSelectedCountryData().iso2 === 'ye' && phoneNumber.startsWith('78') && phoneNumber.length === 9;
+
+    if (iti.isValidNumber() || isYemenMobile78) {
+        document.getElementById('pPhone').style.borderColor = "#f1f5f9";
+        nextStep(idx);
+    } else {
         showToast("رقم الهاتف غير صحيح لدولة " + iti.getSelectedCountryData().name, "error");
         document.getElementById('pPhone').style.borderColor = "#ef4444";
         return;
     }
-    
-    document.getElementById('pPhone').style.borderColor = "#f1f5f9";
-    nextStep(idx);
 }
 
 function validateDateTimeAndNext(idx) {
