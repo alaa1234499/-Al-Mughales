@@ -550,7 +550,7 @@ body.dark-mode .faq-answer { background: rgba(255,255,255,0.02); }
 .time-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
 .time-slot { padding: 10px; border: 1px solid #e2e8f0; border-radius: 10px; text-align: center; cursor: pointer; font-size: 0.9rem; transition: 0.2s; position: relative;}
 .time-slot:hover:not(.disabled) { border-color: var(--primary); color: var(--primary); }
-.time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
+.time-slot.selected { background: var(--primary) !important; color: #ffffff !important; border-color: var(--primary) !important; font-weight: bold; }
 .time-slot.disabled { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; border-style: dashed; }
 .time-slot.disabled::after { content: 'محجوز'; position: absolute; top: -10px; right: 0; font-size: 0.6rem; background: #ef4444; color: white; padding: 2px 5px; border-radius: 5px; }
 
