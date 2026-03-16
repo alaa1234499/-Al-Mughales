@@ -355,12 +355,17 @@
       loadPendingConsultations(); // تحميل الاستشارات المعلقة عند فتح لوحة الدكتور
   };
 
+  // ===========================================
+  // تعديل دالة showPharmacistPanel (تم التعديل حسب الطلب)
+  // ===========================================
   window.showPharmacistPanel = function() {
       document.getElementById('admin-dashboard-main').style.display = 'none';
       document.getElementById('doctor-panel').style.display = 'none';
       document.getElementById('pharmacist-panel').style.display = 'block';
-      loadInventory(); // تحميل المخزون للصيدلي
-      loadPrescriptionsForPharmacist(); // تحميل الوصفات الطبية للصيدلي
+      
+      // تشغيل الجلب بالترتيب
+      loadPrescriptionsForPharmacist(); // تظهر أولاً
+      loadInventory(); // تظهر تحتها
   };
 
   window.backToAdminMain = function() {
@@ -489,39 +494,39 @@
       `).join('');
   }
 
-  // التعديل: إضافة دالة تحميل الوصفات الطبية للصيدلي
+  // ===========================================
+  // التعديل: دالة عرض الوصفات بتصميم كروت عصري (تم التعديل حسب الطلب)
+  // ===========================================
   async function loadPrescriptionsForPharmacist() {
+      const container = document.getElementById('prescriptions-cards-container');
+      
       const { data: prescriptions, error } = await supabase
           .from('medical_records')
-          .select(`
-              prescribed_meds,
-              patients ( name, phone ),
-              created_at
-          `)
+          .select(`prescribed_meds, patients ( name, phone ), created_at`)
           .not('prescribed_meds', 'is', null)
           .order('created_at', { ascending: false })
-          .limit(20);
+          .limit(10);
 
-      if (error) {
-          showToast("خطأ في تحميل الوصفات", "error");
+      if (error || !prescriptions || prescriptions.length === 0) {
+          container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px;">لا توجد وصفات طبية حالياً</div>';
           return;
       }
 
-      const container = document.getElementById('prescriptions-list-body');
-      if (!prescriptions || prescriptions.length === 0) {
-          container.innerHTML = '<tr><td colspan="3" class="empty-msg">لا توجد وصفات طبية حديثة</td></tr>';
-      } else {
-          container.innerHTML = prescriptions.map(p => {
-              const medsList = Array.isArray(p.prescribed_meds) ? p.prescribed_meds.join('، ') : p.prescribed_meds;
-              return `
-              <tr>
-                  <td>${p.patients.name}</td>
-                  <td>${p.patients.phone}</td>
-                  <td>${medsList}</td>
-                  <td>${new Date(p.created_at).toLocaleDateString('ar-EG')}</td>
-              </tr>
-          `}).join('');
-      }
+      container.innerHTML = prescriptions.map(p => {
+          const medsList = Array.isArray(p.prescribed_meds) ? p.prescribed_meds.join(' ، ') : p.prescribed_meds;
+          const time = new Date(p.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+          return `
+          <div class="prescription-card" style="animation: fadeIn 0.4s ease forwards;">
+              <div class="card-info">
+                  <p style="font-size: 0.75rem; color: var(--primary); font-weight: bold;">${time} - ${new Date(p.created_at).toLocaleDateString('ar-EG')}</p>
+                  <h4><i class="fas fa-user-medical"></i> ${p.patients.name}</h4>
+                  <p><i class="fas fa-phone"></i> ${p.patients.phone}</p>
+                  <div class="med-tag"><i class="fas fa-prescription-bottle-alt"></i> ${medsList}</div>
+              </div>
+              <button class="nav-btn" style="width: 100%; margin-top: 15px; font-size: 0.8rem; height: 40px;" onclick="showToast('تم صرف الوصفة بنجاح', 'success')">تم الصرف</button>
+          </div>
+          `;
+      }).join('');
   }
 
   window.updateStock = async function(id, newQuantity) {
@@ -2164,6 +2169,43 @@ body.dark-mode .review-card { background: #334155; }
     height: 100px;
     resize: vertical;
 }
+
+/* =========================================== */
+/* إضافة تنسيقات CSS الجديدة للكروت */
+/* =========================================== */
+.med-card, .prescription-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.prescription-card:hover, .med-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+}
+
+.prescription-card::before {
+    content: 'جديد';
+    position: absolute;
+    top: 10px;
+    left: -30px;
+    background: var(--primary);
+    color: white;
+    padding: 5px 35px;
+    transform: rotate(-45deg);
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.card-info h4 { color: var(--secondary); margin-bottom: 8px; font-weight: 800; }
+.card-info p { font-size: 0.9rem; color: var(--text-muted); margin: 4px 0; }
+.med-tag { background: rgba(2, 132, 199, 0.1); color: var(--primary); padding: 4px 12px; border-radius: 8px; font-size: 0.85rem; display: inline-block; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -2600,32 +2642,32 @@ body.dark-mode .review-card { background: #334155; }
             </div>
         </div>
 
-        <!-- لوحة الصيدلي -->
-        <div id="pharmacist-panel" style="display: none;">
-            <div class="panel-header">
-                <button class="panel-btn back" onclick="backToAdminMain()"><i class="fas fa-arrow-right"></i> رجوع</button>
-                <h2><i class="fas fa-pills"></i> لوحة الصيدلي</h2>
+        <!-- =========================================== -->
+        <!-- لوحة الصيدلي - تم التعديل حسب الطلب -->
+        <!-- =========================================== -->
+        <div id="pharmacist-panel" style="display:none; animation: fadeIn 0.5s ease;">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="color: var(--primary); font-weight: 800;"><i class="fas fa-pills"></i> لوحة التحكم بالصيدلية</h2>
+                <button class="nav-btn" onclick="backToAdminMain()" style="background: var(--secondary) !important;"><i class="fas fa-arrow-right"></i> العودة</button>
             </div>
-            
-            <div class="admin-panel">
-                <h3>المخزون الدوائي</h3>
-                <!-- التعديل: استخدام الكروت بدلاً من الجدول -->
-                <div class="pharmacy-grid" id="inventory-cards-container"></div>
-                
-                <h3 style="margin-top: 40px;">آخر الوصفات الطبية</h3>
-                <table id="prescriptions-table" class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>المريض</th>
-                            <th>رقم الجوال</th>
-                            <th>الأدوية</th>
-                            <th>التاريخ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prescriptions-list-body">
-                        <!-- سيتم ملؤها بالجافاسكريبت -->
-                    </tbody>
-                </table>
+
+            <div class="section-container" style="margin-bottom: 50px;">
+                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span style="width: 10px; height: 30px; background: var(--primary); border-radius: 5px;"></span>
+                    آخر الوصفات الطبية الواردة
+                </h3>
+                <div id="prescriptions-cards-container" class="modern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="loading-shimmer" style="text-align: center; padding: 40px; color: var(--text-muted);">جاري جلب الوصفات...</div>
+                </div>
+            </div>
+
+            <div class="section-container">
+                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span style="width: 10px; height: 30px; background: var(--success); border-radius: 5px;"></span>
+                    إدارة المخزون الدوائي
+                </h3>
+                <div id="inventory-cards-container" class="modern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    </div>
             </div>
         </div>
     </div>
