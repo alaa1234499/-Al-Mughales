@@ -2576,3 +2576,34 @@ body.dark-mode #inventory-panel .med-card-apple .med-actions .btn-remove:hover {
 
 .stat-label { color: #0f172a !important; }
 body.dark-mode .stat-label { color: #f1f5f9 !important; }
+
+/* ===== مساعد المغلس الذكي - تنسيق مستقل ===== */
+#alMughalesAiButton{
+    position:fixed!important;right:24px!important;bottom:24px!important;z-index:2147483000!important;
+    border:0!important;border-radius:999px!important;padding:14px 20px!important;
+    background:linear-gradient(135deg,#0284c7,#0369a1)!important;color:#fff!important;
+    box-shadow:0 12px 35px rgba(0,0,0,.22)!important;cursor:pointer!important;
+    display:flex!important;align-items:center!important;gap:9px!important;font-family:'Cairo',sans-serif!important;
+    font-size:15px!important;font-weight:800!important;line-height:1!important;opacity:1!important;visibility:visible!important;
+    transform:none!important;pointer-events:auto!important;
+}
+#alMughalesAiButton:hover{filter:brightness(1.06)!important;transform:translateY(-2px)!important}
+#alMughalesAiButton i{font-size:18px!important}
+.al-ai-panel{
+    position:fixed!important;right:24px!important;bottom:86px!important;width:min(380px,calc(100vw - 30px))!important;
+    height:min(570px,calc(100vh - 110px))!important;z-index:2147482999!important;
+    background:var(--card-bg,#fff)!important;color:var(--secondary,#0f172a)!important;border:1px solid rgba(2,132,199,.18)!important;
+    border-radius:24px!important;box-shadow:0 24px 70px rgba(0,0,0,.24)!important;overflow:hidden!important;
+    display:flex!important;flex-direction:column!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+    transform:translateY(15px) scale(.97)!important;transition:opacity .2s ease,transform .2s ease,visibility .2s ease!important;
+}
+.al-ai-panel.al-ai-open{opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:none!important}
+.al-ai-header{padding:15px 16px!important;background:linear-gradient(135deg,#0284c7,#0369a1)!important;color:#fff!important;display:flex!important;justify-content:space-between!important;align-items:center!important}
+.al-ai-title{display:flex!important;align-items:center!important;gap:10px!important}.al-ai-title>i{font-size:22px!important}.al-ai-title strong,.al-ai-title small{display:block!important}.al-ai-title small{font-size:11px!important;opacity:.82!important}
+.al-ai-close{border:0!important;background:rgba(255,255,255,.15)!important;color:#fff!important;width:34px!important;height:34px!important;border-radius:50%!important;font-size:25px!important;line-height:1!important;cursor:pointer!important}
+.al-ai-messages{flex:1!important;overflow-y:auto!important;padding:16px!important;background:var(--bg,#f8fafc)!important;display:flex!important;flex-direction:column!important;gap:10px!important}
+.al-ai-bubble{max-width:88%!important;padding:10px 13px!important;border-radius:16px!important;font-size:13px!important;line-height:1.8!important;word-break:break-word!important}.al-ai-bot{align-self:flex-start!important;background:var(--card-bg,#fff)!important;border:1px solid rgba(2,132,199,.1)!important}.al-ai-user{align-self:flex-end!important;background:#0284c7!important;color:#fff!important}
+.al-ai-quick{display:flex!important;gap:6px!important;overflow-x:auto!important;padding:9px 12px!important;background:var(--card-bg,#fff)!important}.al-ai-quick button{white-space:nowrap!important;border:1px solid rgba(2,132,199,.25)!important;background:transparent!important;color:#0369a1!important;border-radius:999px!important;padding:7px 10px!important;cursor:pointer!important;font-family:'Cairo',sans-serif!important;font-size:11px!important}
+.al-ai-form{display:flex!important;gap:8px!important;padding:10px 12px!important;border-top:1px solid rgba(100,116,139,.15)!important;background:var(--card-bg,#fff)!important}.al-ai-form input{flex:1!important;min-width:0!important;border:1px solid #cbd5e1!important;border-radius:13px!important;padding:10px 12px!important;outline:none!important;font-family:'Cairo',sans-serif!important;background:var(--bg,#f8fafc)!important;color:var(--secondary,#0f172a)!important}.al-ai-form button{width:44px!important;border:0!important;border-radius:13px!important;background:#0284c7!important;color:#fff!important;cursor:pointer!important}.al-ai-note{text-align:center!important;font-size:9px!important;color:#64748b!important;padding:0 10px 9px!important;background:var(--card-bg,#fff)!important}
+.al-ai-typing{opacity:.75!important;font-style:italic!important}
+@media(max-width:600px){#alMughalesAiButton{right:14px!important;bottom:14px!important;padding:13px 16px!important}.al-ai-panel{right:10px!important;bottom:72px!important;width:calc(100vw - 20px)!important;height:min(560px,calc(100vh - 90px))!important}}

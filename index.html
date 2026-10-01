@@ -128,6 +128,7 @@
                     <div class="designer-label">تم التصميم والتطوير بواسطة</div>
                     <div class="developers-names">
                         <span class="dev-name"><i class="fas fa-code"></i> م. علاء المغلس</span>
+                        <span class="dev-name"><i class="fas fa-terminal"></i> م. أيمن المغلس</span>
                     </div>
                 </div>
             </div>
@@ -645,6 +646,106 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== عنوان Cloudflare Worker لمساعد المغلس ===== -->
+    <script>
+        window.AL_MUGHALES_AI_ENDPOINT = "https://al-mughales.alaamoghles.workers.dev";
+    </script>
+
+    <!-- ===== مساعد المغلس الذكي ===== -->
+    <button id="alMughalesAiButton" type="button" aria-label="فتح مساعد المغلس" aria-expanded="false"
+        onclick="(function(){var p=document.getElementById('alMughalesAiPanel');if(p){p.classList.toggle('al-ai-open');p.setAttribute('aria-hidden',p.classList.contains('al-ai-open')?'false':'true');var b=document.getElementById('alMughalesAiButton');if(b)b.setAttribute('aria-expanded',p.classList.contains('al-ai-open')?'true':'false');}})()">
+        <i class="fas fa-robot"></i><span>مساعد المغلس</span>
+    </button>
+
+    <div id="alMughalesAiPanel" class="al-ai-panel" aria-hidden="true">
+        <div class="al-ai-header">
+            <div class="al-ai-title"><i class="fas fa-robot"></i><div><strong>مساعد المغلس</strong><small>المساعد الذكي للمستشفى</small></div></div>
+            <button type="button" class="al-ai-close" aria-label="إغلاق" onclick="(function(){var p=document.getElementById('alMughalesAiPanel');if(p){p.classList.remove('al-ai-open');p.setAttribute('aria-hidden','true');}var b=document.getElementById('alMughalesAiButton');if(b)b.setAttribute('aria-expanded','false');})()">×</button>
+        </div>
+        <div id="alMughalesAiMessages" class="al-ai-messages">
+            <div class="al-ai-bubble al-ai-bot">مرحباً 👋<br>أنا مساعد المغلس الذكي. اسألني عن أقسام المستشفى، الأطباء، الخدمات أو طريقة حجز موعد.</div>
+        </div>
+        <div class="al-ai-quick">
+            <button type="button" onclick="window.alMughalesAsk&&window.alMughalesAsk('ما هي أقسام المستشفى؟')">الأقسام</button>
+            <button type="button" onclick="window.alMughalesAsk&&window.alMughalesAsk('كيف أحجز موعد؟')">حجز موعد</button>
+            <button type="button" onclick="window.alMughalesAsk&&window.alMughalesAsk('ما هي خدمات المستشفى؟')">الخدمات</button>
+        </div>
+        <form id="alMughalesAiForm" class="al-ai-form" onsubmit="return window.alMughalesSend ? window.alMughalesSend(event) : false;">
+            <input id="alMughalesAiInput" type="text" maxlength="1200" autocomplete="off" placeholder="اكتب سؤالك هنا...">
+            <button type="submit" aria-label="إرسال"><i class="fas fa-paper-plane"></i></button>
+        </form>
+        <div class="al-ai-note">للمعلومات العامة فقط؛ لا يغني عن الطبيب أو الطوارئ.</div>
+    </div>
+
+    <script>
+    /* ===== مساعد المغلس: اتصال آمن عبر Cloudflare Worker ===== */
+    (function(){
+        'use strict';
+        var AI_ENDPOINT = window.AL_MUGHALES_AI_ENDPOINT || '';
+        var busy = false;
+        var conversationHistory = [];
+
+        function panel(){ return document.getElementById('alMughalesAiPanel'); }
+        function openPanel(){
+            var p=panel(); if(!p)return;
+            p.classList.add('al-ai-open'); p.setAttribute('aria-hidden','false');
+            var b=document.getElementById('alMughalesAiButton'); if(b)b.setAttribute('aria-expanded','true');
+        }
+        function closePanel(){
+            var p=panel(); if(!p)return;
+            p.classList.remove('al-ai-open'); p.setAttribute('aria-hidden','true');
+            var b=document.getElementById('alMughalesAiButton'); if(b)b.setAttribute('aria-expanded','false');
+        }
+        function addMessage(text,bot){
+            var box=document.getElementById('alMughalesAiMessages'); if(!box)return;
+            var d=document.createElement('div'); d.className='al-ai-bubble '+(bot?'al-ai-bot':'al-ai-user'); d.textContent=String(text||'');
+            box.appendChild(d); box.scrollTop=box.scrollHeight;
+        }
+        function addTyping(){
+            var box=document.getElementById('alMughalesAiMessages'); if(!box)return null;
+            var d=document.createElement('div'); d.className='al-ai-bubble al-ai-bot al-ai-typing'; d.textContent='يكتب الآن…';
+            box.appendChild(d); box.scrollTop=box.scrollHeight; return d;
+        }
+        function normalizeAnswer(data){
+            if(!data)return '';
+            if(typeof data.answer==='string')return data.answer;
+            if(typeof data.response==='string')return data.response;
+            if(data.result&&typeof data.result.response==='string')return data.result.response;
+            if(data.choices&&data.choices[0]&&data.choices[0].message&&typeof data.choices[0].message.content==='string')return data.choices[0].message.content;
+            return '';
+        }
+        async function ask(q){
+            if(!AI_ENDPOINT)return 'المساعد الذكي غير مكتمل الإعداد.';
+            var controller=new AbortController();
+            var timer=setTimeout(function(){controller.abort();},30000);
+            try{
+                var res=await fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,history:conversationHistory.slice(-8)}),signal:controller.signal,credentials:'omit'});
+                var data={}; try{data=await res.json();}catch(_){data={};}
+                if(!res.ok)throw new Error(data.error||'تعذر الاتصال بالمساعد');
+                var answer=normalizeAnswer(data); if(!answer)throw new Error('وصل رد غير مفهوم');
+                return answer;
+            }catch(err){
+                if(err&&err.name==='AbortError')return 'الاتصال أخذ وقتًا أطول من المتوقع. جرّب مرة أخرى.';
+                return (err&&err.message&&err.message!=='Failed to fetch') ? err.message : 'تعذر الاتصال بالمساعد الذكي الآن. جرّب مرة أخرى.';
+            }finally{clearTimeout(timer);}
+        }
+        window.alMughalesAsk=function(q){ openPanel(); var input=document.getElementById('alMughalesAiInput'); if(input)input.value=q; return window.alMughalesSendText(q); };
+        window.alMughalesSendText=async function(q){
+            q=(q||'').trim(); if(!q||busy)return false;
+            openPanel(); addMessage(q,false); conversationHistory.push({role:'user',content:q}); busy=true;
+            var typing=addTyping(); var answer=await ask(q);
+            if(typing&&typing.parentNode)typing.parentNode.removeChild(typing);
+            addMessage(answer,true); conversationHistory.push({role:'assistant',content:answer}); busy=false; return false;
+        };
+        window.alMughalesSend=function(e){
+            if(e)e.preventDefault(); if(busy)return false;
+            var input=document.getElementById('alMughalesAiInput'); if(!input)return false;
+            var q=input.value.trim(); if(!q)return false; input.value=''; window.alMughalesSendText(q); return false;
+        };
+        document.addEventListener('keydown',function(e){if(e.key==='Escape')closePanel();});
+    })();
+    </script>
 
     <!-- ===== جافاسكريبت (ملف منفصل) ===== -->
     <script src="script.js"></script>
