@@ -942,9 +942,20 @@ const todayLimit = new Date().toISOString().split('T')[0];
 document.getElementById('pDate').setAttribute('min', todayLimit);
 
 window.showSection = function(sectionId) {
-    document.querySelectorAll('section').forEach(sec => { sec.classList.remove('active'); sec.style.display = 'none'; });
+    // Only switch the site's top-level pages. Never hide nested sections/components inside them.
+    document.querySelectorAll('body > section').forEach(sec => { sec.classList.remove('active'); sec.style.display = 'none'; });
     const target = document.getElementById(sectionId);
-    if (target) { target.classList.add('active'); target.style.display = 'block'; document.querySelectorAll('.nav-links li a, .nav-item').forEach(item => item.classList.remove('active')); if (sectionId === 'home') document.getElementById('nav-home')?.classList.add('active'); else if (sectionId === 'book') document.getElementById('nav-book')?.classList.add('active'); else if (sectionId === 'patient-dashboard') document.getElementById('nav-dashboard')?.classList.add('active'); else if (sectionId === 'admin') document.getElementById('nav-admin')?.classList.add('active'); if (sectionId === 'book') initTimeSlots(); if (sectionId === 'admin') { if (typeof renderAdminUI === 'function') renderAdminUI(window.isAdminLoggedIn); if (window.isAdminLoggedIn) { render(); loadPatientsList(); loadInventory(); } } window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';
+        document.querySelectorAll('.nav-links li a, .nav-item').forEach(item => item.classList.remove('active'));
+        if (sectionId === 'home') document.getElementById('nav-home')?.classList.add('active');
+        else if (sectionId === 'book') document.getElementById('nav-book')?.classList.add('active');
+        else if (sectionId === 'patient-dashboard') document.getElementById('nav-dashboard')?.classList.add('active');
+        else if (sectionId === 'health') document.getElementById('nav-health')?.classList.add('active');
+        if (sectionId === 'book') initTimeSlots();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 };
 
 function initTimeSlots() { const container = document.getElementById('timeSlotsContainer'); const selectedDate = document.getElementById('pDate').value; const currentService = document.getElementById('service-type').value; if(!container) return; loadAppointmentsFromFirebase().then(list => { container.innerHTML = times.map(t => { const isTaken = list.some(item => item.date === selectedDate && item.fullDate.includes(t) && item.service === currentService); return isTaken ? `<div class="time-slot disabled">${t}</div>` : `<div class="time-slot" onclick="selectTime(this, '${t}')">${t}</div>`; }).join(''); }); }
@@ -1654,3 +1665,349 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('scroll', function() { const nav = document.getElementById('mainNav'); if (window.scrollY > 50) nav.classList.add('scrolled'); else nav.classList.remove('scrolled'); });
+// =========================================================
+// مركز صحتك الجديد — تفاعلات مستقلة وآمنة للواجهة العامة
+// =========================================================
+window.openHealthView = function(view) {
+    const views = document.querySelectorAll('.health-view');
+    const items = document.querySelectorAll('.health-command-item');
+    views.forEach(v => { v.hidden = v.id !== `health-view-${view}`; v.classList.toggle('active', v.id === `health-view-${view}`); });
+    items.forEach(btn => btn.classList.toggle('active', btn.dataset.healthView === view));
+    const target = document.getElementById(`health-view-${view}`);
+    if (target) {
+        target.hidden = false;
+        if (window.matchMedia('(max-width:700px)').matches) {
+            setTimeout(() => target.scrollIntoView({behavior:'smooth', block:'start'}), 40);
+        }
+    }
+};
+
+window.healthV2BMI = function() {
+    const weight = parseFloat(document.getElementById('health-v2-weight')?.value);
+    const height = parseFloat(document.getElementById('health-v2-height')?.value);
+    const out = document.getElementById('health-v2-bmi-result');
+    if (!out) return;
+    if (!weight || !height || weight <= 0 || height <= 0) { out.textContent = 'أدخل الوزن والطول أولًا.'; return; }
+    const bmi = weight / Math.pow(height / 100, 2);
+    let label = bmi < 18.5 ? 'أقل من النطاق المعتاد' : bmi < 25 ? 'ضمن النطاق المعتاد' : bmi < 30 ? 'أعلى من النطاق المعتاد' : 'مرتفع';
+    out.innerHTML = `BMI: <strong>${bmi.toFixed(1)}</strong> — ${label}.`;
+};
+
+window.healthV2Water = function() {
+    const weight = parseFloat(document.getElementById('health-v2-water')?.value);
+    const out = document.getElementById('health-v2-water-result');
+    if (!out) return;
+    if (!weight || weight <= 0) { out.textContent = 'أدخل الوزن أولًا.'; return; }
+    const liters = weight * 0.035;
+    out.innerHTML = `تقدير تقريبي: <strong>${liters.toFixed(1)} لتر</strong> يوميًا. قد تختلف الحاجة حسب الطقس والنشاط والحالة الصحية.`;
+};
+
+window.setSleepPlan = function(type) {
+    const out = document.getElementById('health-v2-sleep-result');
+    if (!out) return;
+    const plans = {
+        adult: 'للبالغين: يستهدف كثير من البالغين عادةً نحو 7–9 ساعات من النوم المنتظم.',
+        teen: 'للمراهقين: يحتاج كثير منهم عادةً نحو 8–10 ساعات من النوم المنتظم.',
+        child: 'للأطفال: الاحتياج يختلف كثيرًا حسب العمر، لذلك يُفضّل الرجوع إلى إرشادات طبيب الأطفال.'
+    };
+    out.textContent = plans[type] || 'اختر الفئة العمرية لعرض النطاق الإرشادي.';
+};
+
+window.filterHealthV2 = function(query) {
+    const q = String(query || '').trim().toLowerCase();
+    const cards = document.querySelectorAll('#health-v2-library .health-knowledge-card');
+    let visible = 0;
+    cards.forEach(card => {
+        const text = (card.dataset.healthV2 || '').toLowerCase() + ' ' + card.textContent.toLowerCase();
+        const show = !q || text.includes(q);
+        card.style.display = show ? '' : 'flex';
+        if (!show) card.style.display = 'none'; else visible++;
+    });
+    const empty = document.getElementById('health-v2-empty');
+    if (empty) empty.hidden = visible !== 0;
+    document.querySelectorAll('.health-library-chips button').forEach(btn => btn.classList.toggle('active', btn.textContent.trim() === (q || 'الكل')));
+    const search = document.getElementById('health-v2-search');
+    if (search && search.value !== query && q !== '') search.value = query;
+};
+
+// =========================================================
+// قسم صحتك — أدوات وتفاعل الواجهة العامة
+// =========================================================
+window.switchHealthTab = function(tabName, ev) {
+    document.querySelectorAll('.health-tab').forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.health-panel').forEach(panel => {
+        panel.classList.remove('active');
+        panel.hidden = true;
+    });
+    const button = ev && ev.currentTarget ? ev.currentTarget : document.querySelector(`.health-tab[onclick*="'${tabName}'"]`);
+    const panel = document.getElementById(`health-${tabName}`);
+    if (button) {
+        button.classList.add('active');
+        button.setAttribute('aria-selected', 'true');
+    }
+    if (panel) {
+        panel.hidden = false;
+        panel.classList.add('active');
+    }
+};
+
+window.calculateBMI = function() {
+    const weight = parseFloat(document.getElementById('health-weight')?.value);
+    const heightCm = parseFloat(document.getElementById('health-height')?.value);
+    const result = document.getElementById('bmi-result');
+    if (!result) return;
+    if (!Number.isFinite(weight) || !Number.isFinite(heightCm) || weight <= 0 || heightCm <= 0) {
+        result.textContent = 'أدخل الوزن والطول بشكل صحيح أولاً.';
+        return;
+    }
+    const heightM = heightCm / 100;
+    const bmi = weight / (heightM * heightM);
+    let label = 'ضمن النطاق المعتاد للبالغين';
+    if (bmi < 18.5) label = 'أقل من 18.5';
+    else if (bmi < 25) label = '18.5 إلى أقل من 25';
+    else if (bmi < 30) label = '25 إلى أقل من 30';
+    else label = '30 أو أكثر';
+    result.innerHTML = `<strong>BMI: ${bmi.toFixed(1)}</strong><br>التصنيف التقريبي: ${label}. هذا المؤشر لا يكفي وحده لتقييم الحالة الصحية.`;
+};
+
+window.calculateWater = function() {
+    const weight = parseFloat(document.getElementById('water-weight')?.value);
+    const result = document.getElementById('water-result');
+    if (!result) return;
+    if (!Number.isFinite(weight) || weight <= 0) {
+        result.textContent = 'أدخل الوزن بشكل صحيح أولاً.';
+        return;
+    }
+    const ml = Math.round(weight * 30);
+    result.innerHTML = `<strong>التقدير التقريبي: ${ml.toLocaleString('ar-YE')} مل يوميًا</strong><br>قد تختلف الحاجة حسب العمر والنشاط والطقس والحالة الصحية، وقد يوصي الطبيب بكمية مختلفة.`;
+};
+
+window.filterHealthLibrary = function(query) {
+    const q = String(query || '').trim().toLowerCase();
+    const cards = document.querySelectorAll('.health-library-card');
+    let visible = 0;
+    cards.forEach(card => {
+        const haystack = `${card.textContent} ${card.getAttribute('data-health-search') || ''}`.toLowerCase();
+        const show = !q || haystack.includes(q);
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+    const empty = document.getElementById('health-library-empty');
+    if (empty) empty.hidden = visible !== 0;
+};
+
+window.runHealthScreening = function() {
+    const emergency = document.getElementById('screen-emergency')?.value;
+    const worsening = document.getElementById('screen-worsening')?.value;
+    const chronic = document.getElementById('screen-chronic')?.value;
+    const wantsBook = document.getElementById('screen-book')?.value;
+    const result = document.getElementById('health-screen-result');
+    if (!result) return;
+    if (!emergency || !worsening || !chronic || !wantsBook) {
+        result.className = 'health-screen-result warning';
+        result.textContent = 'أكمل الإجابات الأربع حتى يظهر التوجيه الأولي.';
+        return;
+    }
+    if (emergency === 'yes') {
+        result.className = 'health-screen-result warning';
+        result.innerHTML = '<strong>تنبيه:</strong> الأعراض المذكورة قد تحتاج إلى تقييم عاجل. لا تعتمد على الموقع أو الاستشارة الإلكترونية في حالة الطوارئ، وتوجه إلى أقرب خدمة طوارئ أو اطلب المساعدة الطبية المحلية فورًا.';
+        return;
+    }
+    if (worsening === 'yes' || wantsBook === 'yes') {
+        result.className = 'health-screen-result normal';
+        result.innerHTML = '<strong>التوجيه الأولي:</strong> يُستحسن حجز موعد ومناقشة الأعراض مع طبيب، خصوصًا إذا كانت جديدة أو تتفاقم. <button type="button" class="health-primary-btn" style="margin-top:12px" onclick="showSection(\'book\')">الانتقال إلى الحجز</button>';
+        return;
+    }
+    if (chronic === 'yes') {
+        result.className = 'health-screen-result info';
+        result.innerHTML = '<strong>التوجيه الأولي:</strong> حافظ على المتابعة الدورية وخذ أدويتك كما وصفها الطبيب، ويمكنك حجز موعد إذا حان وقت المراجعة أو ظهرت أعراض جديدة.';
+        return;
+    }
+    result.className = 'health-screen-result info';
+    result.textContent = 'لا تظهر من إجاباتك الحالية علامة تستدعي توجيهًا عاجلًا. استمر في العادات الصحية والمتابعة الطبية عند الحاجة.';
+};
+
+window.submitHealthConsultation = async function(event) {
+    if (event) event.preventDefault();
+    const name = document.getElementById('health-consult-name')?.value.trim();
+    const phone = document.getElementById('health-consult-phone')?.value.trim();
+    const question = document.getElementById('health-consult-question')?.value.trim();
+    const btn = document.getElementById('health-consult-submit');
+    if (!name || !phone || !question) {
+        showToast('يرجى إكمال الاسم ورقم الجوال والاستشارة', 'error');
+        return false;
+    }
+    if (!supabase) {
+        showToast('تعذر الاتصال بقاعدة البيانات الآن', 'error');
+        return false;
+    }
+    if (locks.consultation) return false;
+    locks.consultation = true;
+    const original = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري الإرسال...'; }
+    try {
+        const cleanPhone = phone.replace(/\s+/g, ' ').trim();
+        const { error } = await supabase.from('consultations').insert([{ patient_phone: cleanPhone, question: `الاسم: ${name}\n${question}`, status: 'pending' }]);
+        if (error) throw error;
+        showToast('تم إرسال استشارتك بنجاح، وسيتم متابعتها من القسم المختص', 'success');
+        document.getElementById('healthQuickConsultForm')?.reset();
+    } catch (error) {
+        console.error('Health consultation error:', error);
+        showToast('تعذر إرسال الاستشارة الآن، حاول مرة أخرى', 'error');
+    } finally {
+        locks.consultation = false;
+        if (btn) { btn.disabled = false; btn.innerHTML = original; }
+    }
+    return false;
+};
+
+// =========================================================
+// HEALTH OS v3 — تفاعلات مركز صحتك الجديد
+// =========================================================
+(function(){
+  const views=['home','ai','tools','symptoms','learn','daily','visit','safety'];
+  window.openHealthOS=function(view){
+    if(!views.includes(view)) view='home';
+    document.querySelectorAll('.health-os-view').forEach(v=>{
+      const active=v.id===`health-os-${view}`;
+      v.hidden=!active;
+      v.classList.toggle('active',active);
+    });
+    document.querySelectorAll('.health-os-nav').forEach(b=>b.classList.toggle('active',b.dataset.healthOs===view));
+    const main=document.querySelector('.health-os-main');
+    if(main && window.matchMedia('(max-width:900px)').matches) main.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  const daily=[
+    ['هل تستطيع أن تجعل اليوم أكثر صحة بـ 10 دقائق؟','اختر عادة صغيرة اليوم: مشي خفيف، كوب ماء، ترتيب وقت النوم أو كتابة سؤال صحي تريد معرفة إجابته.'],
+    ['اجعل الحركة أسهل من التفكير فيها.','قسّم وقت الجلوس الطويل إلى فترات قصيرة من الحركة المناسبة لك بدل انتظار وقت رياضي مثالي.'],
+    ['اسأل نفسك: ما الشيء الصحي الذي أؤجله؟','اكتب خطوة واحدة صغيرة تستطيع تنفيذها اليوم، واجعلها واضحة وقابلة للإنجاز.'],
+    ['المعلومة الجيدة توفر عليك القلق.','بدل البحث العشوائي، اكتب سؤالك بوضوح واستفد من مكتبة مركز صحتك أو مساعدك الصحي.']
+  ];
+  let dailyIndex=Number(localStorage.getItem('mughales_health_daily_index')||0)%daily.length;
+  window.healthNextDaily=function(){dailyIndex=(dailyIndex+1)%daily.length;localStorage.setItem('mughales_health_daily_index',dailyIndex);const [t,p]=daily[dailyIndex];const a=document.getElementById('health-daily-title'),b=document.getElementById('health-daily-text');if(a)a.textContent=t;if(b)b.textContent=p;};
+
+  window.healthV3BMI=function(){
+    const w=parseFloat(document.getElementById('health-v3-weight')?.value),h=parseFloat(document.getElementById('health-v3-height')?.value),o=document.getElementById('health-v3-bmi');
+    if(!o)return;if(!w||!h||w<=0||h<=0){o.textContent='أدخل الوزن والطول أولًا.';return;}
+    const bmi=w/Math.pow(h/100,2);let label=bmi<18.5?'أقل من النطاق المعتاد':bmi<25?'ضمن النطاق المعتاد':bmi<30?'أعلى من النطاق المعتاد':'مرتفع';o.innerHTML=`BMI <strong>${bmi.toFixed(1)}</strong> — ${label}.`;
+  };
+  window.healthV3Water=function(){const w=parseFloat(document.getElementById('health-v3-water')?.value),o=document.getElementById('health-v3-water-result');if(!o)return;if(!w||w<=0){o.textContent='أدخل الوزن أولًا.';return;}o.innerHTML=`تقدير تقريبي: <strong>${(w*.035).toFixed(1)} لتر</strong> يوميًا. قد تختلف الحاجة حسب الطقس والنشاط والحالة الصحية.`;};
+  window.healthSleep=function(type){const o=document.getElementById('health-v3-sleep');if(!o)return;const x={adult:'للبالغين: كثير منهم يحتاجون عادةً نحو 7–9 ساعات.',teen:'للمراهقين: كثير منهم يحتاجون عادةً نحو 8–10 ساعات.',child:'للأطفال: الاحتياج يختلف حسب العمر، ويُفضّل الرجوع إلى إرشادات طبيب الأطفال.'};o.textContent=x[type]||'';};
+  let timer=null,seconds=60;window.healthStartTimer=function(){const out=document.getElementById('healthTimer'),btn=document.getElementById('healthTimerBtn');if(!out||!btn)return;if(timer){clearInterval(timer);timer=null;}seconds=60;btn.disabled=true;const tick=()=>{out.textContent=`00:${String(seconds).padStart(2,'0')}`;if(seconds<=0){clearInterval(timer);timer=null;btn.disabled=false;btn.innerHTML='ابدأ دقيقة <i class="fas fa-play"></i>';out.textContent='انتهت الدقيقة ✓';return;}seconds--;};tick();timer=setInterval(tick,1000);};
+
+  window.healthSymptom=function(title,text){const o=document.getElementById('healthSymptomResult');if(!o)return;o.hidden=false;o.innerHTML=`<b><i class="fas fa-circle-info"></i> ${title}</b><span>${text}</span>`;o.scrollIntoView({behavior:'smooth',block:'nearest'});};
+
+  window.healthLibrarySearch=function(q){q=String(q||'').trim().toLowerCase();let n=0;document.querySelectorAll('#healthLibraryProGrid .health-article').forEach(c=>{const hay=(c.textContent+' '+(c.dataset.search||'')).toLowerCase();const show=!q||hay.includes(q);c.style.display=show?'':'none';if(show)n++;});document.getElementById('healthLibraryEmpty').hidden=n!==0;};
+  window.healthLibraryFilter=function(cat,btn){document.querySelectorAll('.health-library-tags button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const search=document.getElementById('healthProSearch');if(search)search.value='';let n=0;document.querySelectorAll('#healthLibraryProGrid .health-article').forEach(c=>{const show=cat==='all'||(c.dataset.cat||'').includes(cat);c.style.display=show?'':'none';if(show)n++;});document.getElementById('healthLibraryEmpty').hidden=n!==0;};
+
+  const challenge=[['اشرب كوب ماء إضافيًا اليوم','اختر لحظة ثابتة خلال يومك واجعلها تذكيرًا بسيطًا بالماء.'],['خذ استراحة حركة قصيرة','بعد فترة من الجلوس، جرّب دقيقة حركة مناسبة لك.'],['اكتب سؤالًا صحيًا واحدًا','سؤال واضح واحد قد يكون أفضل من عشر عمليات بحث عشوائية.'],['جهّز معلومة لطبيبك','دوّن عرضًا مهمًا ومتى بدأ، إذا كنت تستعد لزيارة.']];
+  let ci=Number(localStorage.getItem('mughales_health_challenge')||0)%challenge.length;function renderChallenge(){const [t,p]=challenge[ci];const a=document.getElementById('healthChallengeTitle'),b=document.getElementById('healthChallengeText'),n=document.getElementById('healthChallengeNumber');if(a)a.textContent=t;if(b)b.textContent=p;if(n)n.textContent=String(ci+1).padStart(2,'0');}function renderStreak(){const n=Number(localStorage.getItem('mughales_health_streak')||0);const o=document.getElementById('healthStreak');if(o)o.textContent=n;}
+  window.healthCompleteChallenge=function(){const last=localStorage.getItem('mughales_health_challenge_date'),today=new Date().toISOString().slice(0,10);if(last!==today){localStorage.setItem('mughales_health_challenge_date',today);localStorage.setItem('mughales_health_streak',String(Number(localStorage.getItem('mughales_health_streak')||0)+1));renderStreak();}const btn=document.getElementById('healthChallengeBtn');if(btn){btn.innerHTML='تم الإنجاز ✓';btn.disabled=true;}ci=(ci+1)%challenge.length;localStorage.setItem('mughales_health_challenge',ci);setTimeout(()=>{renderChallenge();const b=document.getElementById('healthChallengeBtn');if(b){b.innerHTML='أنجزته <i class="fas fa-check"></i>';b.disabled=false;}},900);};
+  window.healthResetStreak=function(){localStorage.removeItem('mughales_health_streak');localStorage.removeItem('mughales_health_challenge_date');renderStreak();};
+  window.healthQuizAnswer=function(btn,correct){document.querySelectorAll('#healthQuizOptions button').forEach(b=>{b.disabled=true;b.classList.remove('correct','wrong');});btn.classList.add(correct?'correct':'wrong');const o=document.getElementById('healthQuizResult');if(o)o.textContent=correct?'إجابة صحيحة — الاستمرارية أهم من المثالية.':'ليست الأفضل؛ جرّب التفكير في عادة ثابتة يمكن تكرارها.';};
+
+  let aiHistory=[];let aiBusy=false;
+  function aiAdd(text,role){const box=document.getElementById('healthAIChat');if(!box)return;const row=document.createElement('div');row.className=`health-ai-message ${role}`;if(role==='bot')row.innerHTML=`<span class="health-ai-avatar"><i class="fas fa-sparkles"></i></span><div></div>`;else row.innerHTML='<div></div>';row.querySelector('div').textContent=text;box.appendChild(row);box.scrollTop=box.scrollHeight;return row;}
+  window.healthAIQuick=function(prefix){const input=document.getElementById('healthAIInput');if(input){input.value=prefix;input.focus();}};
+  window.healthAISend=async function(e){if(e)e.preventDefault();const input=document.getElementById('healthAIInput');const q=(input?.value||'').trim();if(!q||aiBusy)return false;aiBusy=true;input.value='';aiAdd(q,'user');aiHistory.push({role:'user',content:q});const typing=aiAdd('يكتب الآن…','bot');try{const endpoint=window.AL_MUGHALES_AI_ENDPOINT||'/api/ai';const res=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:`أنت مساعد صحي تثقيفي داخل مستشفى المغلس. أجب بالعربية وبوضوح. لا تشخّص، لا تصف جرعات أو أدوية علاجية، ولا تطمئن المستخدم في حالة طارئة. إذا ظهرت علامة طوارئ فاذكر ضرورة طلب مساعدة عاجلة. سؤال المستخدم: ${q}`,history:aiHistory.slice(-8)}),credentials:'omit'});let data={};try{data=await res.json();}catch(_){}if(!res.ok)throw new Error(data.error||'تعذر الاتصال');let ans=data.answer||data.response||data.result?.response||data.choices?.[0]?.message?.content;if(!ans)throw new Error('لم يصل رد مفهوم');if(typing?.parentNode)typing.parentNode.removeChild(typing);aiAdd(ans,'bot');aiHistory.push({role:'assistant',content:ans});}catch(err){if(typing?.parentNode)typing.parentNode.removeChild(typing);aiAdd('تعذر الاتصال بالمساعد الآن. جرّب مرة أخرى أو استخدم المكتبة الطبية.','bot');}finally{aiBusy=false;}return false;};
+
+  document.addEventListener('DOMContentLoaded',function(){renderChallenge();renderStreak();const [t,p]=daily[dailyIndex];const a=document.getElementById('health-daily-title'),b=document.getElementById('health-daily-text');if(a)a.textContent=t;if(b)b.textContent=p;});
+})();
+
+/* =========================================================
+   Health Center — 4 large tabs
+   ========================================================= */
+(function(){
+  window.healthOpenTab=function(tab){
+    const map={explore:'explore',assistant:'assistant',care:'care',learn:'learn'};
+    if(!map[tab]) tab='explore';
+    document.querySelectorAll('.health-v1-panel').forEach(p=>p.classList.toggle('active',p.id==='health-tab-'+tab));
+    const panel=document.getElementById('health-tab-'+tab);
+    if(panel) panel.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  window.healthV1ScrollBack=function(){
+    const section=document.getElementById('health');
+    if(section) section.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  const daily4=[
+    ['الماء عادة بسيطة','وزّع شرب الماء على يومك بدلًا من الانتظار حتى تشعر بالعطش.'],
+    ['النوم جزء من صحتك','حاول تثبيت وقت نوم واستيقاظ مناسبين لك قدر الإمكان.'],
+    ['الحركة لا تحتاج وقتًا طويلًا','استراحة حركة قصيرة خلال يومك أفضل من الجلوس المتواصل.'],
+    ['اكتب سؤالك للطبيب','قبل موعدك، دوّن أهم سؤال حتى لا تنساه أثناء الزيارة.']
+  ];
+  let di4=Number(localStorage.getItem('mughales_health_daily4')||0)%daily4.length;
+  function render4(){const a=document.getElementById('health4-daily-title'),b=document.getElementById('health4-daily-text');if(a&&b){a.textContent=daily4[di4][0];b.textContent=daily4[di4][1];}}
+  window.health4NextDaily=function(){di4=(di4+1)%daily4.length;localStorage.setItem('mughales_health_daily4',String(di4));render4();};
+  document.addEventListener('DOMContentLoaded',render4);
+})();
+
+
+/* =========================================================
+   Health Center — agreed v1 interactions
+   ========================================================= */
+(function(){
+  const bodyInfo={
+    head:{tag:'الرأس',title:'الدماغ والجهاز العصبي',text:'الدماغ جزء أساسي من الجهاز العصبي، ويساهم في الحركة والإحساس والتفكير والذاكرة وتنظيم كثير من وظائف الجسم.'},
+    chest:{tag:'الصدر',title:'القلب والرئتان',text:'يحتوي الصدر على أعضاء مهمة مثل القلب والرئتين. القلب يضخ الدم، والرئتان تساعدان الجسم على تبادل الأكسجين وثاني أكسيد الكربون.'},
+    abdomen:{tag:'البطن',title:'الجهاز الهضمي وأعضاء أخرى',text:'توجد في البطن أعضاء متعددة، منها المعدة والأمعاء والكبد والبنكرياس. لكل عضو وظيفة مختلفة ضمن عمليات الهضم والاستقلاب.'},
+    legs:{tag:'الساقان',title:'العضلات والعظام والحركة',text:'تساعد عضلات وعظام الساقين والمفاصل على الوقوف والمشي والحركة والتوازن، وتتأثر وظائفها بالنشاط والإصابات والحالة الصحية العامة.'}
+  };
+  window.healthOpenTab=function(tab){
+    const allowed=['explore','assistant','care','learn'];
+    if(!allowed.includes(tab)) tab='explore';
+    document.querySelectorAll('.health-v1-panel').forEach(p=>p.classList.toggle('active',p.id==='health-tab-'+tab));
+    const panel=document.getElementById('health-tab-'+tab);
+    if(panel) setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  };
+  window.healthV1ScrollBack=function(){
+    const section=document.getElementById('health');
+    if(section) section.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+  window.healthBodyInfo=function(key){
+    const item=bodyInfo[key], out=document.getElementById('healthBodyInfo');
+    if(!item||!out) return;
+    out.innerHTML=`<span>${item.tag}</span><h3>${item.title}</h3><p>${item.text}</p><div class="health-info-fact"><i class="fas fa-circle-info"></i><span>هذه معلومة تثقيفية عامة وليست تشخيصًا. إذا لديك أعراض أو قلق صحي فاستشر طبيبًا.</span></div>`;
+    out.animate([{opacity:.55,transform:'translateY(5px)'},{opacity:1,transform:'none'}],{duration:240,easing:'ease-out'});
+  };
+  window.healthCalculateBMI=function(){
+    const w=Number(document.getElementById('healthBMIWeight')?.value), h=Number(document.getElementById('healthBMIHeight')?.value), out=document.getElementById('healthBMIResult');
+    if(!out) return;
+    if(!Number.isFinite(w)||!Number.isFinite(h)||w<=0||h<50||h>250){out.textContent='أدخل الوزن والطول بشكل صحيح أولًا.';return;}
+    const bmi=w/Math.pow(h/100,2);let label='ضمن النطاق المعتاد للبالغين';
+    if(bmi<18.5) label='أقل من 18.5'; else if(bmi<25) label='18.5 إلى أقل من 25'; else if(bmi<30) label='25 إلى أقل من 30'; else label='30 أو أكثر';
+    out.innerHTML=`<strong>BMI: ${bmi.toFixed(1)}</strong><br>التصنيف التقريبي: ${label}. هذا المؤشر لا يكفي وحده لتقييم الحالة الصحية.`;
+  };
+  window.healthCalculateWater=function(){
+    const w=Number(document.getElementById('healthWaterWeight')?.value), out=document.getElementById('healthWaterResult');
+    if(!out) return;
+    if(!Number.isFinite(w)||w<=0){out.textContent='أدخل وزنك بشكل صحيح أولًا.';return;}
+    const ml=Math.round(w*30);out.innerHTML=`<strong>التقدير التقريبي: ${ml.toLocaleString('ar-YE')} مل يوميًا</strong><br>قد تختلف الحاجة حسب العمر والنشاط والطقس والحالة الصحية.`;
+  };
+  window.healthSaveVisitNote=function(){
+    const input=document.getElementById('healthVisitNote'), out=document.getElementById('healthVisitResult');
+    if(!input||!out) return;
+    const note=input.value.trim();
+    if(!note){out.textContent='اكتب الملاحظة أولًا.';return;}
+    try{localStorage.setItem('alMughalesHealthVisitNote',note);out.innerHTML='<strong>تم الحفظ على هذا الجهاز.</strong><br>لن يتم إرسال الملاحظة إلى المستشفى.';}catch(e){out.textContent='تعذر الحفظ على هذا الجهاز.';}
+  };
+  window.healthFilterLearn=function(cat,button){
+    document.querySelectorAll('.health-learning-filters button').forEach(b=>b.classList.remove('active'));if(button)button.classList.add('active');
+    document.querySelectorAll('#healthLearningGrid article').forEach(card=>{card.style.display=(cat==='all'||card.dataset.cat===cat)?'flex':'none';});
+  };
+  window.healthReadArticle=function(button){
+    const card=button?.closest('article'), reader=document.getElementById('healthArticleReader');if(!card||!reader)return;
+    document.getElementById('healthArticleCat').textContent=card.querySelector('span')?.textContent||'';
+    document.getElementById('healthArticleTitle').textContent=card.querySelector('h3')?.textContent||'';
+    document.getElementById('healthArticleText').textContent=card.querySelector('p')?.textContent||'';
+    reader.hidden=false;reader.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  window.healthCloseArticle=function(){const r=document.getElementById('healthArticleReader');if(r)r.hidden=true;};
+  window.healthAIQuick=function(q){const input=document.getElementById('healthAIInput');if(!input)return;input.value=q;input.focus();if(typeof window.healthAISend==='function'){setTimeout(()=>window.healthAISend(),30);}};
+  document.addEventListener('DOMContentLoaded',function(){
+    try{const saved=localStorage.getItem('alMughalesHealthVisitNote');if(saved){const input=document.getElementById('healthVisitNote');if(input)input.value=saved;}}catch(e){}
+  });
+})();

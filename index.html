@@ -26,11 +26,6 @@
 </head>
 <body>
 
-    <!-- ===== زر الوضع الليلي ===== -->
-    <div class="dark-mode-toggle" id="darkModeBtn" onclick="toggleDarkMode()">
-        <i class="fas fa-moon"></i>
-    </div>
-
     <!-- ===== القائمة العلوية ===== -->
     <nav id="mainNav">
         <div class="logo">
@@ -41,10 +36,10 @@
             <li><a onclick="showSection('home')" id="nav-home" class="active">الرئيسية</a></li>
             <li><a onclick="showSection('book')" id="nav-book" class="nav-btn">حجز موعد</a></li>
             <li><a onclick="showSection('patient-dashboard')" id="nav-dashboard">ملفي الطبي</a></li>
-            <li><div class="nav-item" onclick="showSection('admin')" id="nav-admin">
-                <i class="fas fa-user-shield"></i>
-                <span>الإدارة</span>
-            </div></li>
+            <li><a onclick="showSection('health')" id="nav-health">
+                <i class="fas fa-heart-pulse"></i>
+                <span>صحتك</span>
+            </a></li>
         </ul>
     </nav>
 
@@ -103,7 +98,7 @@
                         <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><h4><i class="fas fa-calendar-plus"></i> كيف يمكنني حجز موعد؟</h4><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-content">يمكنك الحجز بسهولة تامة عبر الضغط على زر "حجز موعد" في القائمة العلوية، ثم اتباع الخطوات الأربع البسيطة لتأكيد بياناتك واختيار الوقت المناسب لك. النظام يعمل بذكاء لضمان عدم تداخل المواعيد.</div></div></div>
                         <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><h4><i class="fas fa-hospital-user"></i> هل تتوفر المستشفى في أيام العطل؟</h4><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-content">نحن في مستشفى المغلس التخصصي نحرص على تواجدنا دائماً لخدمتكم، لذا تعمل المستشفى طوال أيام الأسبوع من الساعة 9 صباحاً وحتى 9 مساءً، باستثناء يوم الجمعة فهو الإجازة الرسمية.</div></div></div>
                         <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><h4><i class="fas fa-calendar-times"></i> كيف يمكنني إلغاء الحجز؟</h4><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-content">في حال رغبتك بإلغاء أو تعديل الموعد، يرجى التواصل معنا عبر أرقام المستشفى أو الواتساب قبل الموعد بـ 24 ساعة على الأقل، حتى نتمكن من إتاحة الفرصة لمرضى آخرين.</div></div></div>
-                        <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><h4><i class="fas fa-user-shield"></i> كيف يتم ضمان خصوصية بياناتي؟</h4><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-content">خصوصيتك هي أولويتنا. نستخدم تقنيات تشفير متطورة لحماية سجلاتك الطبية، ولا يمكن لأي شخص الوصول إليها سوى الطبيب المعالج فقط من خلال لوحة الإدارة.</div></div></div>
+                        <div class="faq-item"><div class="faq-question" onclick="toggleFaq(this)"><h4><i class="fas fa-user-shield"></i> كيف يتم ضمان خصوصية بياناتي؟</h4><i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-answer"><div class="faq-answer-content">خصوصيتك هي أولويتنا. نستخدم تقنيات تشفير متطورة لحماية سجلاتك الطبية، ولا يمكن الوصول إلى سجلاتك الطبية إلا ضمن الصلاحيات المخصصة للرعاية الطبية.</div></div></div>
                     </div>
                 </div>
             </div>
@@ -136,8 +131,94 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- صفحة حجز الموعد (Book)                      -->
+    <!-- مركز صحتك — Visual Health Experience v1 -->
     <!-- ========================================== -->
+    <section id="health">
+      <div class="health-v1">
+        <div class="health-v1-hero">
+          <div class="health-v1-hero-copy">
+            <span class="health-v1-kicker"><i class="fas fa-heart-pulse"></i> مركزك الصحي الرقمي</span>
+            <h1>صحتك تبدأ<br><em>من فهمك لها.</em></h1>
+            <p>مساحة هادئة داخل مستشفى المغلس تساعدك على فهم جسمك، استخدام أدوات صحية بسيطة، وطرح أسئلتك قبل زيارة الطبيب.</p>
+            <button class="health-v1-primary" type="button" onclick="healthOpenTab('explore')">اكتشف مركز صحتك <i class="fas fa-arrow-left"></i></button>
+          </div>
+          <div class="health-v1-hero-media">
+            <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1200&q=88" alt="رعاية صحية حديثة" loading="lazy">
+            <div class="health-v1-photo-note"><i class="fas fa-shield-heart"></i><span><b>تثقيف صحي</b><small>واضح، مختصر، ولا يغني عن الطبيب</small></span></div>
+          </div>
+        </div>
+
+        <div class="health-v1-start">
+          <div class="health-v1-section-title"><span>ابدأ من هنا</span><h2>ماذا تريد أن تفعل اليوم؟</h2><p>أربع وجهات واضحة بدل عشرات الأقسام.</p></div>
+          <div class="health-v1-choices">
+            <button type="button" class="health-v1-choice" onclick="healthOpenTab('explore')"><div class="choice-image"><img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=800&q=85" alt="استكشاف الجسم" loading="lazy"></div><div class="choice-content"><span>01</span><h3>اكتشف صحتك</h3><p>استكشف مناطق الجسم ومعلوماتها الأساسية بطريقة بصرية.</p><i class="fas fa-arrow-left"></i></div></button>
+            <button type="button" class="health-v1-choice" onclick="healthOpenTab('assistant')"><div class="choice-image"><img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=800&q=85" alt="مساعد صحي" loading="lazy"></div><div class="choice-content"><span>02</span><h3>اسأل وافهم</h3><p>اسأل المساعد عن مصطلح أو معلومة صحية تريد فهمها.</p><i class="fas fa-arrow-left"></i></div></button>
+            <button type="button" class="health-v1-choice" onclick="healthOpenTab('care')"><div class="choice-image"><img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=85" alt="العناية بالصحة" loading="lazy"></div><div class="choice-content"><span>03</span><h3>اعتنِ بنفسك</h3><p>أدوات بسيطة لحساب المؤشرات وتجهيز ما تريد قبل موعدك.</p><i class="fas fa-arrow-left"></i></div></button>
+            <button type="button" class="health-v1-choice" onclick="healthOpenTab('learn')"><div class="choice-image"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=85" alt="التثقيف الصحي" loading="lazy"></div><div class="choice-content"><span>04</span><h3>تعلّم أكثر</h3><p>معلومات صحية قصيرة ومركزة بدل الجدران الطويلة من النصوص.</p><i class="fas fa-arrow-left"></i></div></button>
+          </div>
+        </div>
+
+        <div class="health-v1-body">
+          <div class="health-v1-feature">
+            <div class="health-v1-feature-image"><img src="https://images.unsplash.com/photo-1530497610245-94d3c16cda28?auto=format&fit=crop&w=1200&q=88" alt="جسم الإنسان والرعاية الصحية" loading="lazy"><div class="health-v1-image-label">افهم جسمك</div></div>
+            <div class="health-v1-feature-copy"><span>تجربة بصرية</span><h2>ماذا يحدث داخل جسمك؟</h2><p>اختر منطقة من الجسم لتظهر لك نبذة مبسطة عن أهم الأعضاء ووظيفتها الأساسية.</p><button type="button" onclick="healthOpenTab('explore')">ابدأ الاستكشاف <i class="fas fa-arrow-left"></i></button></div>
+          </div>
+
+          <div class="health-v1-story-grid">
+            <div class="health-v1-story story-dark"><span>موضوع اليوم</span><h3>العناية بصحتك تبدأ بخطوة صغيرة.</h3><p>نوم أفضل، حركة أكثر، سؤال صحيح للطبيب، أو فهم معلومة كنت تجهلها.</p><button type="button" onclick="healthOpenTab('learn')">اقرأ الفكرة <i class="fas fa-arrow-left"></i></button></div>
+            <div class="health-v1-story story-photo"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=900&q=85" alt="طبيب ومريض" loading="lazy"><div><span>قبل موعدك</span><h3>حضّر ما تريد أن تقوله للطبيب.</h3><button type="button" onclick="showSection('book')">احجز موعدًا <i class="fas fa-arrow-left"></i></button></div></div>
+          </div>
+
+          <button type="button" class="health-v1-ai-banner" onclick="healthOpenTab('assistant')"><span class="ai-mark"><i class="fas fa-sparkles"></i></span><span><b>مساعد المغلس الصحي</b><strong>لديك سؤال؟ ابدأ بالمعلومة.</strong><small>اسأل عن مصطلح، تقرير، عرض، أو موضوع صحي وسنساعدك على فهمه بشكل تعليمي.</small></span><i class="fas fa-arrow-left"></i></button>
+
+          <div class="health-v1-safety"><div class="safety-icon"><i class="fas fa-triangle-exclamation"></i></div><div><span>الأولوية للسلامة</span><h3>عند الأعراض الخطرة، لا تنتظر المعلومة الرقمية.</h3><p>ألم صدر شديد، صعوبة تنفس شديدة، فقدان وعي، نزيف شديد أو أعراض عصبية مفاجئة تستدعي طلب المساعدة الطبية العاجلة.</p></div></div>
+        </div>
+
+        <div class="health-v1-panels">
+          <div id="health-tab-explore" class="health-v1-panel active">
+            <div class="health-v1-panel-head"><div><span>01 — اكتشف صحتك</span><h2>اختر منطقة من الجسم.</h2><p>المعلومات هنا للتثقيف العام وليست تشخيصًا لحالتك.</p></div><button type="button" onclick="healthV1ScrollBack()">العودة للأعلى <i class="fas fa-arrow-up"></i></button></div>
+            <div class="health-explore-grid">
+              <div class="health-body-stage" aria-label="استكشاف الجسم">
+                <div class="body-silhouette"><span class="body-head"></span><span class="body-neck"></span><span class="body-torso"></span><span class="body-arm arm-r"></span><span class="body-arm arm-l"></span><span class="body-leg leg-r"></span><span class="body-leg leg-l"></span></div>
+                <button type="button" class="body-hotspot hs-head" onclick="healthBodyInfo('head')"><i class="fas fa-brain"></i><b>الرأس</b></button>
+                <button type="button" class="body-hotspot hs-chest" onclick="healthBodyInfo('chest')"><i class="fas fa-lungs"></i><b>الصدر</b></button>
+                <button type="button" class="body-hotspot hs-abdomen" onclick="healthBodyInfo('abdomen')"><i class="fas fa-stomach"></i><b>البطن</b></button>
+                <button type="button" class="body-hotspot hs-legs" onclick="healthBodyInfo('legs')"><i class="fas fa-person-walking"></i><b>الساقان</b></button>
+              </div>
+              <div class="health-body-info" id="healthBodyInfo"><span>ابدأ من الرسم</span><h3>اختر منطقة من الجسم</h3><p>اضغط على إحدى المناطق لتظهر لك المعلومة هنا.</p><div class="health-info-fact"><i class="fas fa-circle-info"></i><span>المعلومة للتثقيف العام ولا تستخدم لتشخيص مرض.</span></div></div>
+            </div>
+          </div>
+
+          <div id="health-tab-assistant" class="health-v1-panel">
+            <div class="health-v1-panel-head"><div><span>02 — اسأل وافهم</span><h2>اسأل. افهم.</h2><p>مساعد تثقيفي لا يشخّص ولا يصف علاجًا.</p></div><button type="button" onclick="healthV1ScrollBack()">العودة للأعلى <i class="fas fa-arrow-up"></i></button></div>
+            <div class="health-v1-ai-wrap"><div class="health-v1-ai-intro"><span>مساعد المغلس الصحي</span><h2>معلومة أوضح.</h2><p>اكتب سؤالك وسأساعدك على فهم المصطلح أو الفكرة بلغة أبسط.</p><div class="health-quick"><button type="button" onclick="healthAIQuick('ما معنى ضغط الدم؟')">ما معنى ضغط الدم؟</button><button type="button" onclick="healthAIQuick('كيف أستعد لموعد الطبيب؟')">كيف أستعد للموعد؟</button><button type="button" onclick="healthAIQuick('ما الفرق بين العرض والتشخيص؟')">العرض والتشخيص</button></div></div><div class="health-ai-chat-modern"><div class="health-ai-messages" id="healthAIChat"><div class="health-ai-message bot"><span class="health-ai-avatar"><i class="fas fa-sparkles"></i></span><div>مرحبًا 👋 ما الشيء الذي تريد فهمه اليوم؟</div></div></div><form class="health-ai-form" onsubmit="return healthAISend(event)"><input id="healthAIInput" autocomplete="off" placeholder="اكتب سؤالك الصحي هنا…"><button type="submit" aria-label="إرسال"><i class="fas fa-arrow-up"></i></button></form></div></div>
+          </div>
+
+          <div id="health-tab-care" class="health-v1-panel">
+            <div class="health-v1-panel-head"><div><span>03 — اعتنِ بنفسك</span><h2>أدوات مفيدة، بدون تعقيد.</h2><p>النتائج تقديرية للتثقيف العام وليست تشخيصًا أو وصفة علاج.</p></div><button type="button" onclick="healthV1ScrollBack()">العودة للأعلى <i class="fas fa-arrow-up"></i></button></div>
+            <div class="health-tools-grid">
+              <div class="health-tool"><div class="tool-top"><span>01</span><i class="fas fa-weight-scale"></i></div><h3>مؤشر كتلة الجسم</h3><p>للأشخاص البالغين، باستخدام الوزن والطول.</p><div class="tool-fields"><label>الوزن (كجم)<input id="healthBMIWeight" type="number" min="1" max="500" step="0.1" placeholder="70"></label><label>الطول (سم)<input id="healthBMIHeight" type="number" min="50" max="250" step="0.1" placeholder="170"></label></div><button type="button" onclick="healthCalculateBMI()">احسب المؤشر</button><div class="tool-result" id="healthBMIResult">أدخل البيانات لرؤية النتيجة.</div></div>
+              <div class="health-tool"><div class="tool-top"><span>02</span><i class="fas fa-droplet"></i></div><h3>تقدير الماء اليومي</h3><p>تقدير تقريبي مبني على الوزن فقط.</p><label>الوزن (كجم)<input id="healthWaterWeight" type="number" min="1" max="500" step="0.1" placeholder="70"></label><button type="button" onclick="healthCalculateWater()">قدّر الكمية</button><div class="tool-result" id="healthWaterResult">أدخل وزنك لمعرفة التقدير.</div></div>
+              <div class="health-tool"><div class="tool-top"><span>03</span><i class="fas fa-clipboard-list"></i></div><h3>جهّز موعدك</h3><p>دوّن أهم الأشياء التي تريد تذكرها قبل دخول العيادة.</p><label>ملاحظتك<textarea id="healthVisitNote" rows="4" placeholder="مثلاً: متى بدأ العرض؟ وما الذي يزيده؟"></textarea></label><button type="button" onclick="healthSaveVisitNote()">حفظ على هذا الجهاز</button><div class="tool-result" id="healthVisitResult">لن يتم إرسال هذه الملاحظة إلى المستشفى.</div></div>
+            </div>
+            <div class="health-v1-tool-note"><i class="fas fa-shield-heart"></i><div><b>مهم</b><span>إذا كنت تتناول أدوية أو لديك حالة مزمنة أو حمل، لا تعتمد على التقديرات العامة وحدها واسأل الطبيب عما يناسبك.</span></div></div>
+          </div>
+
+          <div id="health-tab-learn" class="health-v1-panel">
+            <div class="health-v1-panel-head"><div><span>04 — تعلّم أكثر</span><h2>تعلّم في دقيقة.</h2><p>معلومات قصيرة تساعدك على فهم المفاهيم الصحية الشائعة.</p></div><button type="button" onclick="healthV1ScrollBack()">العودة للأعلى <i class="fas fa-arrow-up"></i></button></div>
+            <div class="health-learning-filters"><button type="button" class="active" onclick="healthFilterLearn('all',this)">الكل</button><button type="button" onclick="healthFilterLearn('body',this)">الجسم</button><button type="button" onclick="healthFilterLearn('visit',this)">زيارة الطبيب</button><button type="button" onclick="healthFilterLearn('daily',this)">العادات اليومية</button></div>
+            <div class="health-learning-grid" id="healthLearningGrid">
+              <article data-cat="body"><span>الجسم</span><h3>ما الفرق بين العرض والتشخيص؟</h3><p>العرض شيء تشعر به أو تلاحظه، أما التشخيص فهو تحديد طبي لحالة اعتمادًا على التاريخ والفحص والفحوصات المناسبة.</p><button type="button" onclick="healthReadArticle(this)">اقرأ الفكرة <i class="fas fa-arrow-left"></i></button></article>
+              <article data-cat="visit"><span>زيارة الطبيب</span><h3>ماذا أحضر معي للموعد؟</h3><p>اكتب الأعراض ووقت بدايتها، وأسماء الأدوية التي تستخدمها، وأهم الأسئلة التي تريد طرحها.</p><button type="button" onclick="healthReadArticle(this)">اقرأ الفكرة <i class="fas fa-arrow-left"></i></button></article>
+              <article data-cat="daily"><span>العادات اليومية</span><h3>لماذا الحركة خلال اليوم مهمة؟</h3><p>تقليل الجلوس المتواصل وإضافة حركة مناسبة لروتينك قد يكون جزءًا مفيدًا من نمط حياة صحي.</p><button type="button" onclick="healthReadArticle(this)">اقرأ الفكرة <i class="fas fa-arrow-left"></i></button></article>
+              <article data-cat="daily"><span>العادات اليومية</span><h3>النوم جزء من العناية بالصحة.</h3><p>ثبات مواعيد النوم والاستيقاظ قدر الإمكان يساعد على بناء روتين أكثر انتظامًا، مع اختلاف الاحتياج حسب العمر.</p><button type="button" onclick="healthReadArticle(this)">اقرأ الفكرة <i class="fas fa-arrow-left"></i></button></article>
+            </div>
+            <div class="health-article-reader" id="healthArticleReader" hidden><button type="button" onclick="healthCloseArticle()" aria-label="إغلاق"><i class="fas fa-xmark"></i></button><span id="healthArticleCat"></span><h3 id="healthArticleTitle"></h3><p id="healthArticleText"></p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="book">
         <div class="container">
             <div class="booking-container">
@@ -324,294 +405,7 @@
     <!-- ========================================== -->
     <!-- صفحة الإدارة (Admin)                       -->
     <!-- ========================================== -->
-    <section id="admin">
-        <div class="container">
-            <div id="adminLoginForm" style="max-width: 400px; margin: 50px auto; text-align: center; background: var(--card-bg); padding: 40px; border-radius: 30px; box-shadow: var(--shadow);">
-                <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px;"></i>
-                <h3>لوحة الإدارة</h3>
-                <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--text-muted);">هذا القسم مخصص للمصرح لهم فقط</p>
-                <div class="input-group"><input type="email" id="adminEmail" placeholder="اسم المستخدم"></div>
-                <div class="input-group"><input type="password" id="adminPass" placeholder="كلمة المرور"></div>
-                <button type="button" onclick="window.loginAdmin(document.getElementById('adminEmail').value, document.getElementById('adminPass').value)" class="nav-btn" style="width: 100%; border: none; cursor: pointer;">دخول</button>
-            </div>
 
-            <div id="adminDashboard" style="display: none;">
-                <div id="admin-dashboard-main">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap: wrap; gap:10px;">
-                        <h2>لوحة الإدارة</h2>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="logoutAdmin()" style="background:#64748b; color:white; padding:10px 20px; border-radius:12px; border:none; cursor:pointer;"><i class="fas fa-sign-out-alt"></i> خروج</button>
-                            <button onclick="exportToCSV()" style="background:var(--success); color:white; padding:10px 20px; border-radius:12px; border:none; cursor:pointer;"><i class="fas fa-file-export"></i> تصدير</button>
-                            <button onclick="loadAppointmentsFromFirebase()" style="background:var(--primary); color:white; padding:10px 20px; border-radius:12px; border:none; cursor:pointer;"><i class="fas fa-sync"></i> تحديث</button>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-bar">
-                        <div class="stat-item"><h4>الإجمالي</h4><p id="totalCount">0</p></div>
-                        <div class="stat-item"><h4>اليوم</h4><p id="todayCount">0</p></div>
-                    </div>
-
-                    <div class="admin-tabs">
-                        <button class="tab-btn active" onclick="showDoctorPanel()"><i class="fas fa-user-md"></i> لوحة الدكتور</button>
-                        <button class="tab-btn" onclick="showPharmacistPanel()"><i class="fas fa-pills"></i> لوحة الصيدلي</button>
-                        <button class="tab-btn" onclick="showInventoryPanel()"><i class="fas fa-boxes"></i> المخزون</button>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 20px;">
-                        <input type="text" id="adminSearch" placeholder="🔍 ابحث عن مريض..." oninput="render()" style="border:2px solid #e2e8f0; padding:15px; border-radius:15px; width: 100%;">
-                        <select id="adminFilter" onchange="render()" style="border:2px solid #e2e8f0; border-radius:15px; padding: 0 10px;">
-                            <option value="all">كل التخصصات</option>
-                            <option value="باطنية عامة">باطنية عامة</option>
-                            <option value="غدد صماء وسكري">غدد صماء وسكري</option>
-                            <option value="جهاز هضمي">جهاز هضمي</option>
-                            <option value="جراحة عامة">جراحة عامة</option>
-                            <option value="جراحة عظام">جراحة عظام</option>
-                            <option value="أطفال وحديثي ولادة">أطفال</option>
-                            <option value="أمراض القلب">أمراض القلب</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-grid" id="cardContainer"></div>
-                </div>
-
-                <!-- ===== لوحة الدكتور ===== -->
-                <div id="doctor-panel" style="display: none;">
-                    
-                    <!-- البطاقة الرئيسية -->
-                    <div id="doctor-main-dashboard" style="display: block;">
-                        <div class="doctor-welcome-card">
-                            <div class="welcome-card-inner">
-                                <div class="welcome-text">
-                                    <div class="welcome-icon"><i class="fas fa-hand-wave"></i></div>
-                                    <h1>مرحباً، <span id="doctor-welcome-name">د. أحمد المغلس</span></h1>
-                                    <p class="doctor-specialty" id="doctor-specialty">أمراض القلب</p>
-                                </div>
-                                <div class="welcome-stats">
-                                    <div class="stat-chip">
-                                        <i class="fas fa-calendar-check"></i>
-                                        <div>
-                                            <span class="stat-number" id="doctor-today-patients">0</span>
-                                            <span class="stat-label">مريض اليوم</span>
-                                        </div>
-                                    </div>
-                                    <div class="stat-divider"></div>
-                                    <div class="stat-chip">
-                                        <i class="fas fa-comment-dots"></i>
-                                        <div>
-                                            <span class="stat-number" id="doctor-new-consults">0</span>
-                                            <span class="stat-label">استشارات جديدة</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button onclick="document.getElementById('doctor-panel').style.display='none'; document.getElementById('admin-dashboard-main').style.display='block'; document.getElementById('pharmacist-panel').style.display='none';" style="position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.3s;">
-                                    <i class="fas fa-arrow-right"></i> خروج
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="dashboard-cards-grid">
-                            <div class="dash-card" onclick="showPatientsList()">
-                                <i class="fas fa-users"></i>
-                                <h3>المرضى والسجلات</h3>
-                                <span class="dash-badge" id="doctor-patients-count-dash">0</span>
-                            </div>
-                            <div class="dash-card" onclick="showConsultsList()">
-                                <i class="fas fa-comments"></i>
-                                <h3>الاستشارات الجديدة</h3>
-                                <span class="dash-badge" id="doctor-consults-count-dash">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- قائمة المرضى -->
-                    <div id="doctor-patients-list-screen" class="doctor-screen" style="display: none;">
-                        <div class="doctor-screen-header">
-                            <div class="header-title-section">
-                                <i class="fas fa-users"></i>
-                                <h2>المرضى</h2>
-                                <span class="patients-count-badge" id="doctor-patients-count-header">0</span>
-                            </div>
-                            <div class="search-bar-modern">
-                                <i class="fas fa-search"></i>
-                                <input type="text" id="doctor-patients-search" placeholder="بحث بالاسم أو رقم الهاتف...">
-                            </div>
-                            <button onclick="backToAdminMain()" class="exit-doctor-btn">
-                                <i class="fas fa-arrow-right"></i> خروج
-                            </button>
-                        </div>
-                        <div class="doctor-patients-grid" id="doctor-patients-list-container"></div>
-                    </div>
-
-                    <!-- مساحة عمل المريض -->
-                    <div id="doctor-patient-detail-screen" style="display: none;">
-                        <div style="max-width: 1100px; margin: 0 auto; padding: 16px;">
-                            <button onclick="backToPatientsList()" 
-                                    style="background: #FFFFFF; border: 1px solid rgba(0,0,0,0.06); padding: 8px 18px; border-radius: 40px; cursor: pointer; color: var(--secondary); font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="15 18 9 12 15 6"></polyline>
-                                </svg>
-                                <span style="font-size: 14px; font-weight: 500;">رجوع</span>
-                            </button>
-
-                            <!-- بطاقة المريض -->
-                            <div style="background: #FFFFFF; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 12px rgba(0,0,0,0.04);">
-                                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
-                                    <div style="display: flex; align-items: center; gap: 16px;">
-                                        <div style="width: 52px; height: 52px; min-width: 52px; background: var(--btn-gradient); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; box-shadow: 0 6px 16px rgba(2,132,199,0.2);">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <div>
-                                            <h2 id="detail-patient-name" style="font-size: clamp(20px, 4vw, 28px); font-weight: 700; margin: 0 0 4px 0; color: #1D1D1F; letter-spacing: -0.3px;">أحمد محمد</h2>
-                                            <p id="detail-patient-phone" style="font-size: 15px; color: #8E8E93; margin: 0; direction: ltr; text-align: right;">+967 70 000 0000</p>
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                        <span style="background: #F2F2F5; padding: 6px 14px; border-radius: 30px; font-size: 13px; color: #1D1D1F; display: flex; align-items: center; gap: 6px;">
-                                            <i class="fas fa-calendar-alt" style="color: var(--primary);"></i> آخر زيارة: <strong id="detail-last-visit">-- / --</strong>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- الإحصائيات -->
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px;">
-                                <div style="background: #F9F9FB; border-radius: 16px; padding: 16px; border: 1px solid rgba(0,0,0,0.03); text-align: center;">
-                                    <div style="font-size: clamp(24px, 4vw, 32px); font-weight: 700; color: var(--secondary);" id="detail-total-records">0</div>
-                                    <div style="font-size: 13px; color: #8E8E93; margin-top: 4px;">السجلات</div>
-                                </div>
-                                <div style="background: #F9F9FB; border-radius: 16px; padding: 16px; border: 1px solid rgba(0,0,0,0.03); text-align: center;">
-                                    <div style="font-size: clamp(24px, 4vw, 32px); font-weight: 700; color: var(--secondary);" id="detail-total-prescriptions">0</div>
-                                    <div style="font-size: 13px; color: #8E8E93; margin-top: 4px;">الوصفات</div>
-                                </div>
-                                <div style="background: #F9F9FB; border-radius: 16px; padding: 16px; border: 1px solid rgba(0,0,0,0.03); text-align: center;">
-                                    <div style="font-size: clamp(24px, 4vw, 32px); font-weight: 700; color: var(--secondary);" id="detail-total-lab">0</div>
-                                    <div style="font-size: 13px; color: #8E8E93; margin-top: 4px;">التحاليل</div>
-                                </div>
-                                <div style="background: #F9F9FB; border-radius: 16px; padding: 16px; border: 1px solid rgba(0,0,0,0.03); text-align: center;">
-                                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 2px;">
-                                        <span style="width: 10px; height: 10px; background: #34C759; border-radius: 50%; display: inline-block;"></span>
-                                        <span style="font-size: 15px; font-weight: 600; color: var(--secondary);">نشط</span>
-                                    </div>
-                                    <div style="font-size: 13px; color: #8E8E93; margin-top: 4px;">الحالة</div>
-                                </div>
-                            </div>
-
-                            <!-- زر السجل الطبي -->
-                            <button id="show-history-apple" onclick="showAppleHistory(currentDoctorPatientIdDetail)" 
-                                    style="background: transparent; border: 1px solid #E5E5EA; padding: 12px 24px; border-radius: 40px; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 24px; display: inline-flex; align-items: center; gap: 10px; transition: all 0.2s ease; color: var(--secondary); width: auto;">
-                                <i class="fas fa-notes-medical" style="color: var(--primary);"></i> السجل الطبي
-                            </button>
-                            <div id="history-panel-apple" style="display: none; margin-bottom: 24px;"></div>
-
-                            <!-- التشخيص -->
-                            <div class="form-section-apple">
-                                <div class="form-title-apple"><i class="fas fa-stethoscope"></i> التشخيص الحالي</div>
-                                <textarea id="doctor-diagnosis-input-detail" class="textarea-apple" rows="4" placeholder="أدخل التشخيص الطبي..."></textarea>
-                            </div>
-
-                            <!-- الأدوية -->
-                            <div class="form-section-apple">
-                                <div class="form-title-apple"><i class="fas fa-pills"></i> الأدوية</div>
-                                <div class="add-row-apple">
-                                    <input type="text" id="new-med-name-detail" placeholder="اسم الدواء">
-                                    <input type="text" id="new-med-dose-detail" placeholder="الجرعة">
-                                    <input type="text" id="new-med-duration-detail" placeholder="المدة">
-                                    <button class="add-btn-apple" onclick="addMedicineToCurrentDetail()" style="background: var(--btn-gradient) !important; box-shadow: var(--btn-shadow) !important;"><i class="fas fa-plus"></i> إضافة</button>
-                                </div>
-                                <div id="meds-list-apple" class="items-list-apple"></div>
-                                <textarea id="doctor-medicines-input-detail" style="display: none;"></textarea>
-                            </div>
-
-                            <!-- المختبر -->
-                            <div class="form-section-apple">
-                                <div class="form-title-apple"><i class="fas fa-microscope"></i> المختبر</div>
-                                <div class="add-row-apple">
-                                    <input type="text" id="new-lab-test-detail" placeholder="اسم الفحص">
-                                    <button class="add-btn-apple" onclick="addLabTestToCurrentDetail()" style="background: var(--btn-gradient) !important; box-shadow: var(--btn-shadow) !important;"><i class="fas fa-plus"></i> إضافة</button>
-                                </div>
-                                <div id="lab-list-apple" class="items-list-apple"></div>
-                                <textarea id="doctor-lab-input-detail" style="display: none;"></textarea>
-                            </div>
-
-                            <!-- زر الحفظ -->
-                            <button class="save-btn-apple" id="save-record-apple" onclick="savePatientRecordDetail()" style="background: var(--btn-gradient) !important; box-shadow: var(--btn-shadow) !important;">
-                                <i class="fas fa-save"></i> حفظ الزيارة وإرسالها للمريض
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- قائمة الاستشارات -->
-                    <div id="doctor-consults-list-screen" class="doctor-screen" style="display: none;">
-                        <div class="doctor-screen-header">
-                            <div class="header-title-section">
-                                <i class="fas fa-comments"></i>
-                                <h2>الاستشارات الجديدة</h2>
-                                <span class="patients-count-badge" id="doctor-consults-count-header">0</span>
-                            </div>
-                            <button onclick="backToDoctorMain()" class="exit-doctor-btn">
-                                <i class="fas fa-arrow-right"></i> رجوع
-                            </button>
-                        </div>
-                        <div id="doctor-consults-list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 5px;"></div>
-                    </div>
-                    
-                    <!-- تفاصيل الاستشارة -->
-                    <div id="doctor-consult-detail-screen" style="display: none;"></div>
-                </div>
-
-                <!-- لوحة الصيدلي -->
-                <div id="pharmacist-panel" style="display:none; animation: fadeIn 0.5s ease;">
-                    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                        <h2 style="color: var(--primary); font-weight: 800;"><i class="fas fa-pills"></i> لوحة التحكم بالصيدلية</h2>
-                        <button onclick="document.getElementById('doctor-panel').style.display='none'; document.getElementById('pharmacist-panel').style.display='none'; document.getElementById('admin-dashboard-main').style.display='block'; document.getElementById('inventory-panel').style.display='none';" style="background: transparent; border: 1px solid var(--primary); padding: 8px 20px; border-radius: 20px; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--primary); display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease; font-family: 'Cairo', sans-serif; box-shadow: none;" onmouseover="this.style.background='var(--primary)'; this.style.color='white'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(2, 132, 199, 0.2)';" onmouseout="this.style.background='transparent'; this.style.color='var(--primary)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                            <i class="fas fa-chevron-right" style="font-size: 11px;"></i>
-                            <span>رجوع</span>
-                        </button>
-                    </div>
-                    <div class="section-container" style="margin-bottom: 50px;">
-                        <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"><span style="width: 10px; height: 30px; background: var(--primary); border-radius: 5px;"></span> آخر الوصفات الطبية الواردة</h3>
-                        <div id="prescriptions-cards-container" class="modern-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;"><div class="loading-shimmer" style="text-align: center; padding: 40px; color: var(--text-muted);">جاري جلب الوصفات...</div></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- لوحة المخزون -->
-        <div id="inventory-panel" style="display:none; animation: fadeIn 0.5s ease; padding: 0 10px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h2 style="font-size: 28px; font-weight: 700; color: #1D1D1F; margin: 0; letter-spacing: -0.5px;">
-                        <i class="fas fa-boxes" style="color: var(--primary); margin-left: 12px;"></i> إدارة المخزون الدوائي
-                    </h2>
-                    <p style="color: #8E8E93; font-size: 15px; margin: 4px 0 0 0;">تحكم بكميات الأدوية والمستلزمات الطبية</p>
-                </div>
-                <button onclick="backFromInventory()" style="background: #F2F2F5; border: none; padding: 10px 24px; border-radius: 40px; font-weight: 600; font-size: 14px; cursor: pointer; color: #1D1D1F; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.background='#E5E5EA'" onmouseout="this.style.background='#F2F2F5'">
-                    <i class="fas fa-arrow-right"></i> رجوع
-                </button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 25px 0 30px 0;">
-                <div style="background: #FFFFFF; border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                    <div style="font-size: 28px; font-weight: 700; color: #1D1D1F;" id="total-meds-count">0</div>
-                    <div style="font-size: 13px; color: #8E8E93;">إجمالي الأصناف</div>
-                </div>
-                <div style="background: #FFFFFF; border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                    <div style="font-size: 28px; font-weight: 700; color: #FF3B30;" id="low-stock-count">0</div>
-                    <div style="font-size: 13px; color: #8E8E93;">مخزون منخفض</div>
-                </div>
-                <div style="background: #FFFFFF; border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                    <div style="font-size: 28px; font-weight: 700; color: #34C759;" id="in-stock-count">0</div>
-                    <div style="font-size: 13px; color: #8E8E93;">متوفر</div>
-                </div>
-                <div style="background: #FFFFFF; border-radius: 16px; padding: 18px 20px; border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
-                    <div style="font-size: 28px; font-weight: 700; color: #007AFF;" id="total-value-count">0</div>
-                    <div style="font-size: 13px; color: #8E8E93;">القيمة الإجمالية</div>
-                </div>
-            </div>
-
-            <div id="inventory-cards-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;"></div>
-        </div>
-    </section>
 
     <!-- ========================================== -->
     <!-- أقسام إضافية (مخفية)                       -->
@@ -632,20 +426,7 @@
         </div>
     </div>
 
-    <div id="deleteConfirmModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card" style="border-top: 10px solid #ef4444; position: relative; overflow: hidden;">
-            <div style="position: absolute; top: -20px; left: -20px; font-size: 10rem; color: rgba(239, 68, 68, 0.05); transform: rotate(-15deg); z-index: 0;"><i class="fas fa-trash-alt"></i></div>
-            <div style="position: relative; z-index: 1;">
-                <div style="width: 80px; height: 80px; background: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 2rem; animation: pulseRed 2s infinite;"><i class="fas fa-exclamation-triangle"></i></div>
-                <h3 style="color: #1e293b; margin-bottom: 10px; font-weight: 800;">تأكيد حذف الموعد</h3>
-                <p style="color: #64748b; line-height: 1.6; margin-bottom: 30px;">هل أنت متأكد من رغبتك في حذف بيانات المريض بشكل نهائي؟ <br><span style="color: #ef4444; font-size: 0.8rem; font-weight: bold;">(لا يمكن التراجع عن هذه العملية لاحقاً)</span></p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <button id="cancelDeleteBtn" class="btn-prev" style="padding: 15px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer;">تراجع</button>
-                    <button id="confirmDeleteBtn" class="nav-btn" style="background: #ef4444 !important; padding: 15px; border-radius: 15px; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3) !important;">نعم، احذف</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- ===== عنوان Cloudflare Worker لمساعد المغلس ===== -->
     <script>
@@ -653,10 +434,24 @@
     </script>
 
     <!-- ===== مساعد المغلس الذكي ===== -->
-    <button id="alMughalesAiButton" type="button" aria-label="فتح مساعد المغلس" aria-expanded="false"
-        onclick="(function(){var p=document.getElementById('alMughalesAiPanel');if(p){p.classList.toggle('al-ai-open');p.setAttribute('aria-hidden',p.classList.contains('al-ai-open')?'false':'true');var b=document.getElementById('alMughalesAiButton');if(b)b.setAttribute('aria-expanded',p.classList.contains('al-ai-open')?'true':'false');}})()">
-        <i class="fas fa-robot"></i><span>مساعد المغلس</span>
-    </button>
+    <!-- ===== مركز الخدمات العائم ===== -->
+    <div class="floating-utility-dock" id="floatingUtilityDock" dir="rtl">
+        <button class="utility-action utility-action-ai" id="alMughalesAiButton" type="button" aria-label="فتح مساعد المغلس" aria-expanded="false"
+            onclick="(function(){var d=document.getElementById('floatingUtilityDock');if(d)d.classList.remove('is-open');var p=document.getElementById('alMughalesAiPanel');if(p){p.classList.toggle('al-ai-open');p.setAttribute('aria-hidden',p.classList.contains('al-ai-open')?'false':'true');var b=document.getElementById('alMughalesAiButton');if(b)b.setAttribute('aria-expanded',p.classList.contains('al-ai-open')?'true':'false');}})()">
+            <i class="fas fa-robot"></i><span>مساعد المغلس</span>
+        </button>
+
+        <button class="utility-action utility-action-theme" id="darkModeBtn" type="button" aria-label="تبديل الوضع الليلي" title="تبديل الوضع الليلي"
+            onclick="(function(){toggleDarkMode();var d=document.getElementById('floatingUtilityDock');if(d)d.classList.remove('is-open');})()">
+            <i class="fas fa-moon"></i>
+        </button>
+
+        <button class="utility-dock-toggle" id="floatingUtilityToggle" type="button" aria-label="فتح مركز الخدمات" aria-expanded="false"
+            onclick="(function(){var d=document.getElementById('floatingUtilityDock');if(!d)return;var open=d.classList.toggle('is-open');var b=document.getElementById('floatingUtilityToggle');if(b)b.setAttribute('aria-expanded',open?'true':'false');b&&b.setAttribute('aria-label',open?'إغلاق مركز الخدمات':'فتح مركز الخدمات');})()">
+            <span class="utility-toggle-icon"><i class="fas fa-robot"></i></span>
+            <span class="utility-toggle-pulse"></span>
+        </button>
+    </div>
 
     <div id="alMughalesAiPanel" class="al-ai-panel" aria-hidden="true">
         <div class="al-ai-header">
