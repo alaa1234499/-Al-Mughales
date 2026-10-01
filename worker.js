@@ -1,4 +1,4 @@
-const MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
 const MAX_MESSAGE_CHARS = 1200;
 const MAX_HISTORY = 8;
 const RATE_WINDOW_MS = 60 * 60 * 1000;

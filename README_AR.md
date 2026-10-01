@@ -1,56 +1,29 @@
-# ربط مساعد المغلس بالذكاء الاصطناعي الحقيقي
+# مساعد المغلس الذكي — النسخة الجاهزة
 
-هذه الحزمة تحتوي على مشروع الموقع نفسه + Cloudflare Worker للمساعد.
+هذه النسخة تربط موقع مستشفى المغلس التخصصي بـ Cloudflare Worker + Workers AI + Supabase.
 
-## 1) أنشئ Worker
+## ما تم تجهيزه
+- `index.html`: تمت إضافة واجهة المساعد ورابط Worker الحقيقي.
+- `style.css`: تمت إضافة تنسيق المساعد فقط في نهاية الملف.
+- `script.js`: محفوظ كما هو بدون تعديل.
+- `cloudflare-worker/worker.js`: يستقبل أسئلة الموقع ويشغل Workers AI ويقرأ البيانات المسموح بها من Supabase.
+- `cloudflare-worker/wrangler.toml`: اسم الـ Worker مضبوط على `al-mughales` ليتطابق مع اسم Worker الحالي في Cloudflare.
 
-في Cloudflare افتح Workers & Pages ثم أنشئ Worker جديد، أو استخدم Wrangler.
+## إعداد Cloudflare المطلوب
+يجب أن يكون Binding موجودًا باسم:
+- `AI`
 
-## 2) اربط Workers AI
+ويجب أن تكون Secrets في Production:
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY`
 
-ملف `wrangler.toml` يحتوي بالفعل على:
+لا تضع أي Secret داخل ملفات الموقع أو GitHub.
 
-```toml
-[ai]
-binding = "AI"
-```
+## النشر
+بعد رفع ملفات هذه الحزمة إلى نفس مستودع GitHub المتصل بـ Cloudflare، سيعيد Cloudflare بناء الـ Worker.
 
-Cloudflare توثق أن هذا يجعل النموذج متاحًا داخل Worker عبر `env.AI.run()`. 
+عنوان Worker المستخدم داخل الموقع:
+`https://al-mughales.alaamoghles.workers.dev`
 
-## 3) أضف متغيرات Worker
-
-في إعدادات Worker أضف:
-
-- `SUPABASE_URL` = رابط مشروع Supabase الموجود في `script.js`.
-- `SUPABASE_PUBLISHABLE_KEY` = المفتاح publishable الموجود في `script.js`.
-
-لا تضع service_role key في الموقع ولا في المتصفح.
-
-## 4) انشر Worker
-
-بعد نشره سيكون لديك رابط شبيه:
-
-`https://al-mughales-ai.<اسم-حسابك>.workers.dev`
-
-## 5) ضع الرابط في الموقع
-
-في `index.html` ابحث عن:
-
-```js
-window.AL_MUGHALES_AI_ENDPOINT = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev";
-```
-
-واستبدله برابط Worker الحقيقي.
-
-## 6) اختبر
-
-جرّب:
-- ما هي أقسام المستشفى؟
-- من أطباء الباطنية؟
-- ما هي الأدوية المتوفرة؟
-- كيف أحجز موعد؟
-- عندي سؤال طبي عام...
-
-## مهم عن المجانية
-
-Workers AI لديه حاليًا حصة مجانية يومية مقدارها 10,000 Neurons على Workers Free. عند تجاوزها تفشل العمليات بدل تحويلك تلقائيًا إلى فاتورة مدفوعة على الخطة المجانية. الحدود والأسعار قد تتغير، لذلك راجع لوحة Cloudflare قبل الإطلاق العام.
+## ملاحظة أمنية
+المساعد مخصص للمعلومات العامة عن المستشفى. لا ترسل له بيانات المرضى أو السجلات الطبية الخاصة، ولا تستخدم `service_role` داخل الموقع أو Worker.
